@@ -17,6 +17,17 @@ module Agree2
       permalink
     end
     
+    # state of the agreement
+    # draft, final, active, terminated
+    def state
+      @state||=load_state
+    end
+    
+    # has agreement been signed by all parties?
+    def active?
+      state=='active'
+    end
+    
     def respond_to?(symbol, include_priv = false)  #:nodoc:
       return true if super symbol,include_priv
       return false if fields.nil?||fields.empty?
@@ -66,6 +77,7 @@ module Agree2
         super method, *args, &block
       end
     end
+    
     
   end
 end

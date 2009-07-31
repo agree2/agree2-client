@@ -128,6 +128,12 @@ module Agree2
       @from_wire=true
       load_attributes(JSON.parse(json))
     end
+    
+    # Loads the state of the object if supported. This is much quicker than downloading and parsing json
+    def load_state
+      user.get(to_url+".state",{"Accept"=>"text/plain"})
+    end
+    
 #    private
 #    
 #    def method_missing(method_symbol, *arguments) #:nodoc:

@@ -1,6 +1,6 @@
 require 'net/https'
 require 'rubygems'
-gem 'oauth', ">= 0.2.4"
+gem 'oauth', ">= 0.3.5"
 require 'oauth'
 gem 'json'
 gem 'activesupport'
@@ -20,15 +20,22 @@ require 'agree2/party'
 require 'agree2/template'
 
 
-
-# FireEagle addition to the <code>OAuth::Consumer</code> class. Taken from Yahoo FireEagle GEM
-class OAuth::Consumer
-  alias_method :create_http_with_verify, :create_http
-  # Monkey patch to silence the SSL warnings
-  def create_http_without_verify #:nodoc:
-    http_object             = create_http_with_verify
-    http_object.verify_mode = OpenSSL::SSL::VERIFY_NONE if uri.scheme=="https"
-    http_object
+if OAuth::VERSION=='0.3.5'
+  unless OAuth::Consumer.method_defined? :create_http_with_ca_file_option
+    class OAuth::Consumer
+      alias_method :create_http_without_ca_file_option, :create_http
+      # monkey patch with ca_file option from 0.3.6 to allow us to set the agree2 certs
+      def create_http_with_ca_file_option(_url = nil)
+        http_object = create_http_without_ca_file_option(_url)
+        if http_object.use_ssl && @options[:ca_file]
+          http_object.ca_file = @options[:ca_file]
+          http_object.verify_mode = OpenSSL::SSL::VERIFY_PEER
+          http_object.verify_depth = 5
+        end
+                
+        http_object
+      end
+      alias_method :create_http, :create_http_with_ca_file_option
+    end
   end
-  alias_method :create_http, :create_http_without_verify
 end

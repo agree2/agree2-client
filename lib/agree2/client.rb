@@ -42,7 +42,7 @@ module Agree2
     #
     # To get these register your application at: https://agree2.com/client_applications
     def initialize(key,secret)
-      @consumer=OAuth::Consumer.new(key,secret,{:site=>AGREE2_URL})
+      @consumer=OAuth::Consumer.new(key,secret,{:site=>AGREE2_URL,:ca_file=>File.join(File.dirname(__FILE__), '..','..','certs','sf_bundle.crt')})
     end
     
     # initialize a new user object with the given token and secret. The user object is what you use to do most of the work.
@@ -63,8 +63,13 @@ module Agree2
     #     @request_token = @client.get_request_token
     #     redirect_to @request_token.authorize_url
     #
-    def get_request_token
-      consumer.get_request_token
+    # If you want to pass a callback_url you should do so here.
+    #
+    #    @request_token = @client.get_request_token :oauth_callback => "http://example.com/cb"
+    #     redirect_to @request_token.authorize_url
+    #
+    def get_request_token(request_options = {})
+      consumer.get_request_token request_options
     end
     
     # Exchange an Authorized RequestToken for a working user object
@@ -72,13 +77,16 @@ module Agree2
     # === Required Field
     # 
     # * <tt>request_token</tt> The Request token created using get_request_token and authorized on Agree2 by your user
+    # * <tt>oauth_verifier</tt> The oauth_verifier passed to your callback url
     #
     # Example:
+    #     
+    #     @request_token = ClientRequestToken.find_by_token params[:oauth_token]
+    #     @user_client = @client.user_from_request_token(@request_token,params[:oauth_verifier])
     #
-    #     @user_client = @client.user_from_request_token(@request_token)
     #
-    def user_from_request_token(request_token)
-      access_token=request_token.get_access_token
+    def user_from_request_token(request_token,oauth_verifier)
+      access_token=request_token.get_access_token(:oauth_verifier=>oauth_verifier)
       user(access_token.token,access_token.secret)
     rescue Net::HTTPServerException=>e
       if e.response.code=='401'

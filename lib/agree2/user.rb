@@ -15,24 +15,24 @@ module Agree2
       @templates||=Agree2::ProxyCollection.new self,'/masters','Template'
     end
     
-    def get(path)
-      handle_response @access_token.get(path,AGREE2_JSON_HEADERS)
+    def get(path,options={})
+      handle_response @access_token.get(path,{'Accept'=>'application/json'}.merge(options))
     end
 
-    def head(path)
-      handle_response @access_token.head(path,AGREE2_JSON_HEADERS)
+    def head(path,options={})
+      handle_response @access_token.head(path,options)
     end
     
-    def post(path,data=nil)
-      handle_response @access_token.post(path,(data ? data.to_json : nil),AGREE2_JSON_HEADERS)
+    def post(path,data=nil,options={})
+      handle_response @access_token.post(path,(data ? data.to_json : nil),AGREE2_JSON_HEADERS.merge(options))
     end
     
-    def put(path,data=nil)
-      handle_response @access_token.put(path,(data ? data.to_json : nil),AGREE2_JSON_HEADERS )
+    def put(path,data=nil,options={})
+      handle_response @access_token.put(path,(data ? data.to_json : nil),AGREE2_JSON_HEADERS.merge(options) )
     end
     
-    def delete(path)
-      handle_response @access_token.delete(path,AGREE2_JSON_HEADERS)
+    def delete(path,options={})
+      handle_response @access_token.delete(path,options)
     end
 
     # OAuth Stuff below here
