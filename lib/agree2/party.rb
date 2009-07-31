@@ -1,6 +1,8 @@
 module Agree2
   class Party<Base
     attr_serializable :id,:role,:email,:first_name,:last_name,:created_at,:updated_at,:organization_name,:status
+    attr_read_only :id,:status,:created_at,:updated_at
+    
     alias_method :agreement,:container  
     
     # Creates a one time signed url to redirect your user to their acceptance page. This url is only valid once. Call again to

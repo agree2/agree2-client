@@ -1,7 +1,10 @@
 module Agree2
   class Agreement<Base
     attr_serializable :permalink,:title,:body,:created_at,:updated_at,:smart_fields,:state,:active_version,
-                      :version,:digest,:finalized_at,:finalized_at,:terminated_at,:activated_at,:valid_to
+                      :version,:digest,:finalized_at,:terminated_at,:activated_at,:valid_to
+                      
+    attr_read_only    :permalink,:state,:created_at,:updated_at,:active_version,:version,
+                      :digest,:finalized_at,:terminated_at,:activated_at
     
     alias_method :fields,:smart_fields
     # Returns the parties to the agreement
@@ -51,7 +54,7 @@ module Agree2
     
     def attributes_for_save #:nodoc:
       if new_record?
-        {self.class.singular_name=>attributes}
+        super
       else
         {"fields"=>fields}
       end

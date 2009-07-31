@@ -17,6 +17,19 @@ module Agree2
       def serializable_attributes # :nodoc:
         read_inheritable_attribute("serializable_attributes")
       end
+
+      def attr_read_only(*attributes) #:nodoc:
+        attributes.map!{|a|a.to_sym}
+        write_inheritable_attribute("read_only_attributes", 
+          Set.new(attributes) + 
+          (read_only_attributes || []))
+        protected *attributes.collect{|a| "#{a.to_s}=".to_sym }
+      end
+
+      # Returns an array of all the attributes that have been made accessible to mass-assignment.
+      def read_only_attributes # :nodoc:
+        read_inheritable_attribute("read_only_attributes")
+      end
       
       def collection_path #:nodoc:
         "/#{collection_name}"
@@ -104,8 +117,17 @@ module Agree2
     
     protected
     
+    # Get the primary attributes of an object as a hash
+    def savable_attributes  #:nodoc:
+      (self.class.serializable_attributes-self.class.read_only_attributes).inject({}) do |h,field|
+        value=self.send(field)
+        h[field]=value if value
+        h
+      end
+    end
+    
     def attributes_for_save #:nodoc:
-      {self.class.singular_name=>attributes}
+      {self.class.singular_name=>savable_attributes}
     end
     
     def decode(element) #:nodoc:
@@ -130,7 +152,7 @@ module Agree2
     end
     
     # Loads the state of the object if supported. This is much quicker than downloading and parsing json
-    def load_state
+    def load_state   #:nodoc:
       user.get(to_url+".state",{"Accept"=>"text/plain"})
     end
     

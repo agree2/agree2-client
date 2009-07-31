@@ -39,9 +39,14 @@ describe Agree2::User do
       @response.stub!(:body).and_return(@json)
     end
     
-    [:get,:head,:delete].each do |m|
+    it "should perform http get" do
+      @token.should_receive(:get).with("/test",{'Accept'=>'application/json'}).and_return(@response)
+      @user.send(:get,"/test").should==@json
+    end
+
+    [:head,:delete].each do |m|
       it "should perform http #{m.to_s}" do
-        @token.should_receive(m).with("/test",{'Content-Type'=>'application/json','Accept'=>'application/json'}).and_return(@response)
+        @token.should_receive(m).with("/test",{}).and_return(@response)
         @user.send(m,"/test").should==@json
       end
     end

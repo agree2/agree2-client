@@ -38,8 +38,8 @@ describe Agree2::Client do
     access_token=mock("access_token")
     access_token.stub!(:token).and_return('token')
     access_token.stub!(:secret).and_return('token_secret')
-    request_token.should_receive(:get_access_token).and_return(access_token)
-    user=@client.user_from_request_token(request_token)
+    request_token.should_receive(:get_access_token).with(:oauth_verifier=>"verifier").and_return(access_token)
+    user=@client.user_from_request_token(request_token,"verifier")
     user.client.should==@client
     user.access_token.consumer.should==@client.consumer
     user.token.should=="token"

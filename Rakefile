@@ -67,4 +67,4 @@ task :clean => [ "rdoc:clobber_doc", "gem:clobber_package" ] do
   end
 end
 
-task :default=>[:spec]
+task :default=>["spec:spec"]

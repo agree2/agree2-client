@@ -12,7 +12,7 @@ describe Agree2::Agreement do
     end
     
     it "should have attribute hash" do
-      @agreement.attributes.should=={:title=>"My Title",:body=>"My Body"}
+      @agreement.send(:savable_attributes).should=={:title=>"My Title",:body=>"My Body"}
     end
     
     it "should have a user" do

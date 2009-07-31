@@ -107,7 +107,7 @@ describe Party do
     describe "Save to Server" do
       before(:each) do      
         @user.should_receive(:put).with("/agreements/hello/parties/1102",
-          {'party'=>@party.attributes}).and_return(@json)
+          {'party'=>@party.send(:savable_attributes)}).and_return(@json)
       end
       
       it "should save and return true" do
