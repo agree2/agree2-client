@@ -40,50 +40,23 @@ namespace :spec do |ns|
   end
 end
 
-namespace :gem do |gem|
-  File.open( 'agree2.gemspec') do |f|
-    @gem=eval(f.read)
-    @version=@gem.version.to_s
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.name = "agree2"
+    gemspec.summary = "Ruby client library for Agree2"
+    gemspec.description = "Ruby library for creating and managing agreements on Agree2"
+    gemspec.email = "support@agree2.com"
+    gemspec.homepage = "http://agree2.com"
+    gemspec.authors = ["Pelle Braendgaard"]
+    gemspec.add_dependency('oauth', '>= 0.3.5')
+    gemspec.add_dependency("json", [">= 1.1.3"])
+    gemspec.add_dependency("activesupport", [">= 2.0.2"])
+    
+    gemspec.rubyforge_project = 'agree2'
   end
-  
-  Rake::GemPackageTask.new @gem do |pkg|
-    pkg.need_tar = true
-    pkg.need_zip = true
-  end
-
-  desc 'Install the package as a gem.'
-  task :install => [:clean, :package] do
-    gem = Dir['pkg/*.gem'].first
-    sh "sudo gem install --local #{gem}"
-  end
-
-  
-  desc 'Package and upload the release to rubyforge.'
-  task :release => [:clean, :package] do |t|
-    pkg = "pkg/#{name}-#{@version}"
-
-    if $DEBUG then
-      puts "release_id = rf.add_release #{rubyforge_name.inspect}, #{name.inspect}, #{@version.inspect}, \"#{pkg}.tgz\""
-      puts "rf.add_file #{rubyforge_name.inspect}, #{name.inspect}, release_id, \"#{pkg}.gem\""
-    end
-
-    rf = RubyForge.new.configure
-    puts "Logging in"
-    rf.login
-
-#    c = rf.userconfig
-#    c["release_notes"] = description if description
-#    c["release_changes"] = changes if changes
-#    c["preformatted"] = true
-
-    files = ["#{pkg}.tgz",
-             "#{pkg}.zip",
-             "#{pkg}.gem"].compact
-
-    puts "Releasing #{name} v. #{@version}"
-    rf.add_release rubyforge_name, name, @version, *files
-  end
-  
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
 desc "Clean up all dirt"
